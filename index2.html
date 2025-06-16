@@ -1,91 +1,118 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Student Record Management System</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      margin: 0;
-      padding: 20px;
-    }
-    .container {
-      max-width: 800px;
-      margin: auto;
-      background: #1e293b;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-    h1 {
-      text-align: center;
-      color: #38bdf8;
-    }
-    h2 {
-      color: #facc15;
-    }
-    p, li {
-      line-height: 1.6;
-    }
-    .code-block {
-      background-color: #0f172a;
-      padding: 15px;
-      overflow-x: auto;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 14px;
-      color: #a5f3fc;
-      border: 1px solid #334155;
-      margin: 20px 0;
-    }
-    a.btn {
-      display: inline-block;
-      margin-top: 15px;
-      padding: 10px 20px;
-      background: #38bdf8;
-      color: #0f172a;
-      text-decoration: none;
-      border-radius: 5px;
-    }
-    a.btn:hover {
-      background: #0ea5e9;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>📘 Student Record Management System</h1>
-    <p>This is a basic console-based Java project that helps manage student data using concepts from DSA like arrays, searching, and sorting.</p>
 
-    <h2>✨ Features</h2>
-    <ul>
-      <li>Add student (name, roll no, marks)</li>
-      <li>Display all students</li>
-      <li>Search student by roll number</li>
-      <li>Delete student by roll number</li>
-      <li>Sort students by marks (descending)</li>
-    </ul>
 
-    <h2>🧠 DSA Concepts Used</h2>
-    <ul>
-      <li>Arrays</li>
-      <li>Linear Search</li>
-      <li>Bubble Sort</li>
-      <li>Loops & Conditions</li>
-    </ul>
 
-    <h2>💻 Java Code</h2>
-    <div class="code-block">
-      // Due to length, full code is on GitHub<br />
-      public class StudentRecordSystem {<br />
-      &nbsp;&nbsp;...<br />
-      }<br />
-    </div>
+  
+import java.util.*;
 
-    <a class="btn" href="https://github.com/YOUR_USERNAME/student-record-system" target="_blank">🔗 View Full Code on GitHub</a>
-  </div>
-</body>
-</html>
+class Student implements Comparable<Student> {
+    String name;
+    int roll;
+    double score;
+
+    public Student(String name, int roll, double score) {
+        this.name = name;
+        this.roll = roll;
+        this.score = score;
+    }
+
+    @Override
+    public int compareTo(Student other) {
+        return Double.compare(this.score, other.score); // Ascending by score
+    }
+
+    @Override
+    public String toString() {
+        return "Name: " + name + ", Roll: " + roll + ", Score: " + score;
+    }
+}
+
+public class StudentRecordManager {
+    static Scanner sc = new Scanner(System.in);
+    static List<Student> studentList = new ArrayList<>();
+
+    public static void main(String[] args) {
+        int choice;
+        do {
+            System.out.println("\n--- Student Record Manager ---");
+            System.out.println("1. Add Student");
+            System.out.println("2. Display Students");
+            System.out.println("3. Sort by Score");
+            System.out.println("4. Search by Roll Number");
+            System.out.println("5. Exit");
+            System.out.print("Enter choice: ");
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+
+            switch (choice) {
+                case 1 -> addStudent();
+                case 2 -> displayStudents();
+                case 3 -> sortStudents();
+                case 4 -> searchStudent();
+                case 5 -> System.out.println("Exiting...");
+                default -> System.out.println("Invalid choice!");
+            }
+        } while (choice != 5);
+    }
+
+    static void addStudent() {
+        System.out.print("Enter Name: ");
+        String name = sc.nextLine();
+        System.out.print("Enter Roll Number: ");
+        int roll = sc.nextInt();
+        System.out.print("Enter Score: ");
+        double score = sc.nextDouble();
+        studentList.add(new Student(name, roll, score));
+        System.out.println("✅ Student added.");
+    }
+
+    static void displayStudents() {
+        if (studentList.isEmpty()) {
+            System.out.println("No records to display.");
+            return;
+        }
+        System.out.println("\n--- Student Records ---");
+        for (Student s : studentList) {
+            System.out.println(s);
+        }
+    }
+
+    static void sortStudents() {
+        Collections.sort(studentList);
+        System.out.println("✅ Sorted by score.");
+    }
+
+    static void searchStudent() {
+        if (studentList.isEmpty()) {
+            System.out.println("No records available.");
+            return;
+        }
+
+        System.out.print("Enter roll number to search: ");
+        int roll = sc.nextInt();
+
+        // Sort first by roll number before binary search
+        studentList.sort(Comparator.comparingInt(s -> s.roll));
+
+        int index = binarySearchByRoll(roll);
+        if (index == -1)
+            System.out.println("❌ Student not found.");
+        else
+            System.out.println("✅ Found: " + studentList.get(index));
+    }
+
+    static int binarySearchByRoll(int roll) {
+        int left = 0, right = studentList.size() - 1;
+        while (left <= right) {
+            int mid = (left + right) / 2;
+            int midRoll = studentList.get(mid).roll;
+
+            if (midRoll == roll)
+                return mid;
+            else if (midRoll < roll)
+                left = mid + 1;
+            else
+                right = mid - 1;
+        }
+        return -1;
+    }
+}
